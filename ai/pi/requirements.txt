@@ -1,0 +1,5 @@
+# Install platform-specific camera/AI packages separately as needed.
+pyserial>=3.5
+opencv-python>=4.9
+fastapi>=0.110
+uvicorn>=0.27
