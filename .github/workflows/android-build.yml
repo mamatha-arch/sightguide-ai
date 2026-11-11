@@ -1,0 +1,46 @@
+name: Android APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate remaining Android platform files
+        working-directory: app
+        run: flutter create . --platforms=android --org com.sightguide.ai --project-name sightguide_ai
+      - name: Get dependencies
+        working-directory: app
+        run: flutter pub get
+      - name: Analyze Dart code
+        working-directory: app
+        run: flutter analyze
+      - name: Build debug APK
+        working-directory: app
+        run: flutter build apk --debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: sightguide-ai-debug-apk
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
